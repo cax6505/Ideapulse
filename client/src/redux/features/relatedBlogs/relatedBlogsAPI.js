@@ -1,4 +1,4 @@
-import publicAxios from "../../../components/publicAxios";
+import publicAxios from "../../../api/axios";
 
 export const getRelatedBlogs = async ({ tags, id }) => {
     const limit = 5;

@@ -1,4 +1,4 @@
-import publicAxios from "../../../components/publicAxios";
+import publicAxios from "../../../api/axios";
 
 const getBlog = async (id) => {
     const response = await publicAxios.get(`/blogs/${id}`);

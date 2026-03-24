@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useMatch, useNavigate } from "react-router-dom";
-import { searched } from "../redux/features/filter/filterSlice";
+import { searched } from "../../redux/features/filter/filterSlice";
 
 const Search = () => {
   const dispatch = useDispatch();

@@ -7,9 +7,11 @@ import {
 } from "react-router-dom";
 import Home from './pages/home/Home.jsx';
 import SingleBlog from './pages/blogs/SingleBlog.jsx';
-import Auth from './components/Auth.jsx';
+import Auth from './components/auth/Auth.jsx';
 import ProtectedRoute from './ProtectedRoute.jsx';
-import About from './components/About.jsx';
+import About from './pages/About.jsx';
+
+import Write from './pages/write/Write.jsx';
 
 const router = createBrowserRouter([
   {
@@ -27,6 +29,10 @@ const router = createBrowserRouter([
       {
         path: "/blogs/:id",
         element: <ProtectedRoute element={<SingleBlog />} />,
+      },
+      {
+        path: "/write",
+        element: <ProtectedRoute element={<Write />} />,
       },
       {
         path: "/auth",
