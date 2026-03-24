@@ -46,8 +46,8 @@ const Home = () => {
       {isLoggedIn && blogs?.length > 0 && <Hero blogs={blogs} />}
 
       {/* Recent Posts Grid */}
-      {blogs?.length > 5 && (
-        <RecentPosts blogs={isLoggedIn ? blogs.slice(5) : blogs} />
+      {isLoggedIn && blogs?.length > 5 && (
+        <RecentPosts blogs={blogs.slice(5)} />
       )}
     </div>
   );
