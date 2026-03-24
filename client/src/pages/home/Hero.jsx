@@ -44,9 +44,12 @@ const Hero = ({ blogs }) => {
                 style={{ backgroundImage: `url(${blog.image})` }}
               ></div>
               <div className="flex flex-col justify-center">
-                <h4 className="text-sm font-bold text-gray-800 group-hover:text-blue-600 transition-colors leading-snug line-clamp-3">
+                <h4 className="text-sm font-bold text-gray-800 group-hover:text-blue-600 transition-colors leading-snug line-clamp-2">
                   {blog.title}
                 </h4>
+                <p className="text-xs text-gray-500 mt-1 line-clamp-2">
+                  {blog.content}
+                </p>
               </div>
             </Link>
           ))}

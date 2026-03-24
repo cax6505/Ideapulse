@@ -6,7 +6,7 @@ const LandingBanner = () => {
     <div className="w-full bg-white flex items-center justify-between border-b pb-24 pt-16">
       <div className="max-w-3xl flex flex-col items-start px-4 md:px-0">
         <h1 className="text-6xl md:text-8xl font-bold font-serif text-gray-900 leading-tight mb-8">
-          IdeaPulse <br/> stories & ideas
+          BlogVerse <br/> stories & ideas
         </h1>
         <p className="text-xl md:text-2xl text-gray-700 mb-10">
           A place to read, write, and deepen your understanding
