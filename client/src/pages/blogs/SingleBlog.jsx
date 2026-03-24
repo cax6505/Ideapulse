@@ -1,84 +1,74 @@
 import React, { useEffect } from "react";
-import { AiOutlineArrowRight, AiOutlineHeart } from "react-icons/ai";
-import { BiCommentDetail } from "react-icons/bi";
-import PopularBlog from "./PopularBlog";
+import { AiOutlineArrowRight } from "react-icons/ai";
 import { useDispatch, useSelector } from "react-redux";
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import { fetchBlog } from "../../redux/features/singleBlog/blogSlice";
-import db from "../../redux/features/blogs/db.json"
 
 const SingleBlog = () => {
   const { id } = useParams();
-  let blog = (db.blogs.find((blog)=>blog.id == id));
-  console.log(blog, "blog");
+  const dispatch = useDispatch();
+  const { blog, isLoading, isError, error } = useSelector((state) => state.blog);
 
-  const { title, image, content, author, authorPic, category, matter } = blog || {};
+  useEffect(() => {
+    dispatch(fetchBlog(id));
+  }, [dispatch, id]);
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <p className="text-xl font-semibold">Loading article...</p>
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <p className="text-xl font-semibold text-red-500">{error || "Failed to load the article"}</p>
+      </div>
+    );
+  }
+
+  const { title, image, content, category, author, reading_time, published_date } = blog || {};
 
   return (
-    <article className="mt-8">
-      <div className="mb-4 md:mb-0 w-full mx-auto relative">
-        <div className="px-4 lg:px-0">
-          <h2 className="text-4xl font-semibold text-gray-800 leading-tight">
-            {title}
-          </h2>
-          <a
-            href="#"
-            className="py-2 text-green-700 inline-flex items-center justify-center mb-2"
-          >
-            {category}
-          </a>
+    <article className="mt-8 max-w-5xl mx-auto">
+      <div className="mb-4 md:mb-0 w-full mx-auto relative px-4 lg:px-0">
+        <h2 className="text-4xl md:text-5xl font-bold font-serif text-gray-900 leading-tight mb-4">
+          {title}
+        </h2>
+        
+        <div className="flex items-center gap-4 mb-6">
+          <span className="py-1 px-3 bg-gray-100 text-gray-700 text-sm font-semibold rounded-full">
+            {category || "General"}
+          </span>
+          <span className="text-gray-500 text-sm font-medium">{published_date}</span>
+          <span className="text-gray-500 text-sm font-medium">• {reading_time}</span>
         </div>
 
         <img
           src={image}
-          className="w-full object-cover lg:rounded"
-          style={{ height: "28em" }}
+          className="w-full object-cover lg:rounded-xl shadow-sm mb-12"
+          style={{ height: "30em" }}
           alt="Blog Cover"
         />
       </div>
 
-      <div className="flex flex-col lg:flex-row lg:space-x-12">
-        <div className="px-4 lg:px-0 mt-8 text-gray-700 text-lg leading-relaxed w-full lg:w-3/4">
-          {matter}
-          <br /> <br />
-          {/* <p>
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Explicabo
-            blanditiis tempora perferendis optio eveniet a fuga cum ipsam,
-            aperiam vitae quasi nisi corporis adipisci molestiae facere qui,
-            culpa distinctio quisquam voluptatum illum veniam, voluptate fugit
-            unde voluptas? Fugiat quidem maxime neque fugit ea! Rem soluta optio
-            eos vel? Perferendis maxime, iure molestias totam, autem voluptatum
-            nulla ad provident quam labore sint earum rem unde quis aspernatur
-            possimus pariatur assumenda magnam eligendi quos, consectetur facere
-            consequatur tempora aut. Architecto beatae unde repellat accusantium
-            velit optio earum pariatur porro. Impedit molestiae officia ex nemo
-            officiis aut, facilis, nesciunt recusandae repudiandae repellendus
-            corrupti sequi mollitia. Eaque corporis nisi repudiandae voluptas
-            eius soluta repellat consequatur praesentium vero, ad nulla, aliquid
-            vel illum sint facere quibusdam necessitatibus laudantium voluptate
-            architecto fuga omnis. Doloremque vero adipisci maiores,
-            consequuntur, eveniet dignissimos reiciendis ad totam nemo iste
-            tempora aliquam itaque quo beatae numquam doloribus recusandae iusto
-            modi perferendis ipsum a fugiat quam harum dicta. Et atque pariatur,
-            error quam fuga earum adipisci. Sequi quo voluptatem amet ullam
-            optio? Quam, dignissimos quidem? Culpa necessitatibus, hic a cumque,
-            molestias dicta nisi autem consequatur beatae tenetur laudantium
-            eveniet quas consequuntur, repudiandae incidunt atque amet assumenda
-            aut. Quae magnam tempore optio temporibus!
-          </p> */}
-        </div>
+      <div className="flex flex-col lg:flex-row lg:space-x-12 px-4 lg:px-0">
+        <div 
+          className="prose prose-lg max-w-none text-gray-800 leading-relaxed w-full"
+          dangerouslySetInnerHTML={{ __html: content || "" }} 
+        />
       </div>
 
-      <div className="flex items-center justify-between mt-4 md:w-2/3">
-        <div className="flex items-center space-x-2 mt-8">
-          <a
-            href="/"
-            className="text-green-700 inline-flex items-center justify-center"
-          >
-            Back to Blogs
-            <AiOutlineArrowRight className="ml-2" />
-          </a>
-        </div>
+      <div className="flex items-center justify-between mt-12 mb-20 px-4 lg:px-0 border-t pt-8">
+        <Link
+          to="/"
+          className="text-gray-900 font-bold hover:text-blue-600 inline-flex items-center justify-center transition-colors"
+        >
+          <AiOutlineArrowRight className="mr-2 rotate-180" />
+          Back to Stories
+        </Link>
       </div>
     </article>
   );
