@@ -2,7 +2,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 
 
-import { FiEdit } from "react-icons/fi";
+import { FiEdit, FiUser, FiLogOut, FiSettings, FiChevronDown } from "react-icons/fi";
 import Search from "./Search";
 import AuthModal from "../auth/AuthModal";
 
@@ -12,6 +12,7 @@ const Navbar = () => {
   const [userProfile, setUserProfile] = useState("");
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [authMode, setAuthMode] = useState('login');
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   const navigate = useNavigate();
 
@@ -36,6 +37,17 @@ const Navbar = () => {
       window.removeEventListener("scroll", handleScroll);
     };
   }, []);
+
+  // Close dropdown on click outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (isDropdownOpen && !event.target.closest('.user-dropdown')) {
+        setIsDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [isDropdownOpen]);
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -84,16 +96,42 @@ const Navbar = () => {
                   <FiEdit className="text-xl opacity-80" />
                   <span>Write</span>
                 </Link>
-                <div className="flex items-center gap-3 border-l pl-4 border-gray-200">
-                  <span className="text-sm font-semibold text-gray-700 hidden lg:block">
-                    {userProfile}
-                  </span>
-                  <button
-                    onClick={handleLogout}
-                    className="text-sm font-semibold text-gray-600 hover:text-black transition-colors"
+                <div className="relative user-dropdown">
+                  <button 
+                    onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                    className="flex items-center gap-2 p-1 rounded-full hover:bg-gray-100 transition-all"
                   >
-                    Logout
+                    <div className="w-10 h-10 rounded-full bg-gray-900 flex items-center justify-center text-white shadow-sm overflow-hidden border border-gray-200">
+                      <FiUser size={22} />
+                    </div>
+                    <FiChevronDown className={`text-gray-500 transition-transform duration-200 ${isDropdownOpen ? 'rotate-180' : ''}`} />
                   </button>
+
+                  {isDropdownOpen && (
+                    <div className="absolute right-0 mt-2 w-52 bg-white rounded-2xl shadow-xl border border-gray-100 py-2 z-[10002] animate-in fade-in zoom-in-95 duration-200">
+                      <div className="px-4 py-3 border-b border-gray-50 mb-1">
+                        <p className="text-xs text-gray-400 font-medium uppercase tracking-wider">Logged in as</p>
+                        <p className="text-sm font-bold text-gray-800 truncate">{userProfile}</p>
+                      </div>
+                      
+                      <Link 
+                        to="/profile" 
+                        onClick={() => setIsDropdownOpen(false)}
+                        className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-600 hover:bg-gray-50 hover:text-black transition-colors"
+                      >
+                        <FiSettings className="text-lg opacity-70" />
+                        <span>Profile Settings</span>
+                      </Link>
+                      
+                      <button
+                        onClick={handleLogout}
+                        className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors mt-1"
+                      >
+                        <FiLogOut className="text-lg opacity-70" />
+                        <span>Logout</span>
+                      </button>
+                    </div>
+                  )}
                 </div>
               </div>
             ) : (

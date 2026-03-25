@@ -10,7 +10,7 @@ const LandingBanner = () => {
       <div className="w-full bg-[#f7f4ea] flex flex-col md:flex-row items-center justify-center md:justify-between h-[calc(100vh-170px)] relative overflow-hidden">
         <div className="max-w-7xl mx-auto w-full flex flex-col md:flex-row items-center justify-between px-6 md:px-12 lg:px-16 h-full py-2 md:py-0">
           
-          <div className="max-w-3xl flex flex-col items-start w-full md:w-2/3 lg:w-[65%] z-10">
+          <div className="max-w-3xl flex flex-col items-start w-full md:w-2/3 lg:w-[60%] z-10 -translate-x-12">
             <h1 className="text-[70px] md:text-[90px] lg:text-[106px] font-serif text-black leading-[0.95] tracking-tighter mb-8">
               Stories, <br/> <span className="whitespace-nowrap">ideas &amp; expression</span>
             </h1>
@@ -25,12 +25,13 @@ const LandingBanner = () => {
             </button>
           </div>
 
-          <div className="hidden lg:flex lg:w-1/3 justify-end items-center h-full absolute right-0 top-0 pr-8 xl:pr-16">
-            <img
-              src="/blog_image.png"
-              alt="Blog illustration"
-              className="h-[70%] max-h-[480px] w-auto object-contain -translate-y-16"
-              style={{ mixBlendMode: 'multiply', clipPath: 'inset(3px)' }}
+          <div className="hidden lg:flex lg:w-1/3 justify-end items-center h-full absolute -right-10 top-0 pr-4">
+            <object
+              data="/blog_image.svg"
+              type="image/svg+xml"
+              aria-label="Blog illustration"
+              className="h-[85%] max-h-[550px] w-auto object-contain -translate-y-16 translate-x-8"
+              style={{ mixBlendMode: 'multiply' }}
             />
           </div>
 
