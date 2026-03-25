@@ -39,14 +39,17 @@ const Home = () => {
     );
   }
 
+  if (!isLoggedIn) {
+     return <LandingBanner />;
+  }
+
   return (
     <div className="font-primary mt-12 mb-20 space-y-20">
-      {/* Conditionally render Hero vs LandingBanner */}
-      {!isLoggedIn && <LandingBanner />}
-      {isLoggedIn && blogs?.length > 0 && <Hero blogs={blogs} />}
+      {/* Hero section */}
+      {blogs?.length > 0 && <Hero blogs={blogs} />}
 
       {/* Recent Posts Grid */}
-      {isLoggedIn && blogs?.length > 5 && (
+      {blogs?.length > 5 && (
         <RecentPosts blogs={blogs.slice(5)} />
       )}
     </div>

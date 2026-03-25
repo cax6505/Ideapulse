@@ -7,7 +7,6 @@ import {
 } from "react-router-dom";
 import Home from './pages/home/Home.jsx';
 import SingleBlog from './pages/blogs/SingleBlog.jsx';
-import Auth from './components/auth/Auth.jsx';
 import ProtectedRoute from './ProtectedRoute.jsx';
 import About from './pages/About.jsx';
 
@@ -33,10 +32,6 @@ const router = createBrowserRouter([
       {
         path: "/write",
         element: <ProtectedRoute element={<Write />} />,
-      },
-      {
-        path: "/auth",
-        element: <Auth />,
       },
     ],
   },

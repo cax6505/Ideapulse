@@ -1,31 +1,48 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import AuthModal from '../../components/auth/AuthModal';
 
 const LandingBanner = () => {
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+
   return (
-    <div className="w-full bg-white flex items-center justify-between border-b pb-24 pt-16">
-      <div className="max-w-3xl flex flex-col items-start px-4 md:px-0">
-        <h1 className="text-6xl md:text-8xl font-bold font-serif text-gray-900 leading-tight mb-8">
-          BlogVerse <br/> stories & ideas
-        </h1>
-        <p className="text-xl md:text-2xl text-gray-700 mb-10">
-          A place to read, write, and deepen your understanding
-        </p>
-        <Link 
-          to="/auth" 
-          className="bg-gray-900 text-white text-xl px-10 py-3 rounded-full hover:bg-black font-medium transition-colors"
-        >
-          Start reading
-        </Link>
-      </div>
-      <div className="hidden lg:block lg:w-1/3">
-        {/* Decorative elements representing creativity mapping mimicking the reference image */}
-        <div className="w-full h-80 bg-green-100 rounded-3xl opacity-50 relative overflow-hidden flex items-center justify-center border-2 border-green-200">
-           <span className="text-6xl animate-pulse">✨</span>
-           <span className="text-6xl absolute top-6 right-10">🚀</span>
+    <>
+      <div className="w-full bg-[#f7f4ea] flex flex-col md:flex-row items-center justify-center md:justify-between h-[calc(100vh-170px)] relative overflow-hidden">
+        <div className="max-w-7xl mx-auto w-full flex flex-col md:flex-row items-center justify-between px-6 md:px-12 lg:px-16 h-full py-2 md:py-0">
+          
+          <div className="max-w-3xl flex flex-col items-start w-full md:w-2/3 lg:w-[65%] z-10">
+            <h1 className="text-[70px] md:text-[90px] lg:text-[106px] font-serif text-black leading-[0.95] tracking-tighter mb-8">
+              Stories, <br/> <span className="whitespace-nowrap">ideas &amp; expression</span>
+            </h1>
+            <p className="text-xl md:text-2xl text-gray-800 mb-10 font-sans whitespace-nowrap">
+              Dive into stories and ideas that inspire clarity and creativity
+            </p>
+            <button 
+              onClick={() => setIsAuthModalOpen(true)}
+              className="bg-black text-white text-xl px-10 py-3 rounded-full hover:bg-gray-800 font-sans transition-colors"
+            >
+              Start reading
+            </button>
+          </div>
+
+          <div className="hidden lg:flex lg:w-1/3 justify-end items-center h-full absolute right-0 top-0 pr-8 xl:pr-16">
+            <img
+              src="/blog_image.png"
+              alt="Blog illustration"
+              className="h-[70%] max-h-[480px] w-auto object-contain -translate-y-16"
+              style={{ mixBlendMode: 'multiply', clipPath: 'inset(3px)' }}
+            />
+          </div>
+
         </div>
       </div>
-    </div>
+
+      <AuthModal 
+        isOpen={isAuthModalOpen} 
+        onClose={() => setIsAuthModalOpen(false)} 
+        initialMode="login" 
+      />
+    </>
   );
 };
 
