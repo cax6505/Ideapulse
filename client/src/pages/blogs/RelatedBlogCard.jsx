@@ -1,75 +1,44 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
 
-const RelatedBlogCard = ({blog}) => {
-const {title,image, content, author, authorPic, category } = blog || {};
+const RelatedBlogCard = ({ blog }) => {
+  if (!blog) return null;
+
   return (
-    <div className="p-4 md:w-1/3">
-    <div className="h-full border-2 border-gray-200 border-opacity-60 rounded-lg overflow-hidden">
-     <Link  to={`/blogs/${blog.id}`}> <img
-        className="lg:h-48 md:h-36 w-full object-cover object-center"
-        src={image}
-        alt="blog"
-      /></Link>
-      <div className="p-6">
-        <p className="tracking-widest text-xs title-font font-medium text-gray-400 mb-1">
-          {category}
-        </p>
-       <Link  to={`/blogs/${blog.id}`}> <h1 className="title-font text-lg font-medium text-gray-900 mb-3">
-          {title.slice(0, 72) + "..."}
-        </h1></Link>
-        <p className="leading-relaxed mb-3">
-          {content.slice(0, 50) + "..."}
-        </p>
-        <div className="flex items-center flex-wrap ">
-          <Link to={`/blogs/1`} className="text-indigo-500 inline-flex items-center md:mb-2 lg:mb-0">
-            Learn More
-            <svg
-              className="w-4 h-4 ml-2"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth="2"
-              fill="none"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path d="M5 12h14"></path>
-              <path d="M12 5l7 7-7 7"></path>
-            </svg>
-          </Link>
-          <span className="text-gray-400 mr-3 inline-flex items-center lg:ml-auto md:ml-0 ml-auto leading-none text-sm pr-3 py-1 border-r-2 border-gray-200">
-            <svg
-              className="w-4 h-4 mr-1"
-              stroke="currentColor"
-              strokeWidth="2"
-              fill="none"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              viewBox="0 0 24 24"
-            >
-              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-              <circle cx="12" cy="12" r="3"></circle>
-            </svg>
-            1.2K
-          </span>
-          <span className="text-gray-400 inline-flex items-center leading-none text-sm">
-            <svg
-              className="w-4 h-4 mr-1"
-              stroke="currentColor"
-              strokeWidth="2"
-              fill="none"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              viewBox="0 0 24 24"
-            >
-              <path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"></path>
-            </svg>
-            6
-          </span>
+    <Link to={`/blogs/${blog.id}`} className="group block h-full p-4 md:w-1/3">
+      <div className="flex flex-col h-full bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-md transition-all duration-300 group-hover:-translate-y-1 group-hover:shadow-xl">
+        <div className="h-40 overflow-hidden relative">
+          <img 
+            src={blog.image} 
+            alt={blog.title} 
+            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" 
+          />
+          <div className="absolute top-3 left-3">
+             <span className="px-2 py-0.5 bg-white/90 backdrop-blur-sm text-[9px] font-bold text-gray-900 rounded-lg shadow-sm uppercase tracking-wider">
+                {blog.category}
+             </span>
+          </div>
+        </div>
+        
+        <div className="p-5 flex flex-col flex-grow">
+          <h4 className="text-base font-bold text-gray-900 mb-3 transition-colors line-clamp-2 leading-tight font-serif">
+            {blog.title}
+          </h4>
+          
+          <div className="flex items-center gap-2 mt-auto pt-4 border-t border-gray-50">
+            <img 
+              src={blog.authorPic || "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"} 
+              alt={blog.author} 
+              className="w-7 h-7 rounded-full object-cover ring-1 ring-gray-100" 
+            />
+            <div className="flex flex-col">
+              <span className="text-[10px] font-bold text-gray-900 leading-none">{blog.author}</span>
+              <span className="text-[9px] text-gray-500 mt-0.5">{blog.published_date}</span>
+            </div>
+          </div>
         </div>
       </div>
-    </div>
-  </div>
+    </Link>
   )
 }
 

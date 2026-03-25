@@ -1,19 +1,5 @@
-import { initializeApp } from "firebase/app";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
-
-// Initialize Firebase
-const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
-  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
-  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
-  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
-  appId: import.meta.env.VITE_FIREBASE_APP_ID,
-};
-
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const googleProvider = new GoogleAuthProvider();
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile, signInWithPopup } from "firebase/auth";
+import { auth, googleProvider } from "./firebase";
 
 // Firebase signup function
 export const signup = async ({ name, email, password }) => {
@@ -24,9 +10,15 @@ export const signup = async ({ name, email, password }) => {
     // Update the user's profile to include the display name
     await updateProfile(user, { displayName: name });
 
-    return { uid: user.uid, email: user.email, displayName: user.displayName };
+    const token = await user.getIdToken();
+    if (token) {
+      localStorage.setItem('token', token);
+    }
+
+    return { uid: user.uid, email: user.email, displayName: user.displayName, token };
   } catch (error) {
     console.error('Signup error:', error.message);
+    localStorage.removeItem('token'); // Clear potentially stale token
     throw new Error(error.message || 'Failed to signup');
   }
 };
@@ -45,6 +37,7 @@ export const login = async ({ email, password }) => {
     return { uid: user.uid, email: user.email, token };
   } catch (error) {
     console.error('Login error:', error.message);
+    localStorage.removeItem('token'); // Clear potentially stale token
     throw new Error(error.message || 'Failed to login');
   }
 };
@@ -63,6 +56,7 @@ export const googleSignIn = async () => {
     return { uid: user.uid, email: user.email, displayName: user.displayName, token };
   } catch (error) {
     console.error('Google Sign-In error:', error.message);
+    localStorage.removeItem('token'); // Clear potentially stale token
     throw new Error(error.message || 'Failed to sign in with Google');
   }
 };

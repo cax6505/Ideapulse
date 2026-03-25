@@ -1,11 +1,41 @@
+import { doc, getDoc } from "firebase/firestore";
+import { db } from "../../../api/firebase";
+
+// Helper for timeout
+const withTimeout = (promise, ms) => {
+    const timeout = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error('TIMEOUT')), ms)
+    );
+    return Promise.race([promise, timeout]);
+};
+
 const getBlog = async (id) => {
     try {
+        // 1. Try Firestore first (with timeout)
+        try {
+            const docRef = doc(db, "blogs", id);
+            const docSnap = await withTimeout(getDoc(docRef), 3000);
+
+            if (docSnap.exists()) {
+                const data = docSnap.data();
+                return {
+                    id: docSnap.id,
+                    ...data,
+                    createdAt: data.createdAt?.toDate?.()?.toISOString() || new Date().toISOString()
+                };
+            }
+        } catch (fsErr) {
+            console.warn("Firestore single blog fetch error or timeout:", fsErr.message);
+            // Continue to Dev.to fallback
+        }
+
+        // 2. Fallback to Dev.to if not in Firestore or Firestore failed
         const response = await fetch(`https://dev.to/api/articles/${id}`);
-        if (!response.ok) throw new Error('API Error');
+        if (!response.ok) return null;
         const article = await response.json();
 
         return {
-            id: article.id,
+            id: article.id.toString(),
             title: article.title,
             content: article.body_html || article.description,
             matter: article.body_markdown || article.description,
@@ -20,7 +50,7 @@ const getBlog = async (id) => {
             createdAt: article.published_timestamp
         };
     } catch (err) {
-        console.error(err);
+        console.error("Error fetching single blog:", err);
         return null;
     }
 }

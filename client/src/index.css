@@ -2,6 +2,18 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+  body {
+    @apply bg-white text-gray-900 transition-colors duration-300;
+  }
+}
+
+:root {
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+}
+
 @layer utilities {
   .animate-float {
     animation: float 6s ease-in-out infinite;
@@ -15,4 +27,19 @@
   0% { transform: translateY(0px); }
   50% { transform: translateY(-15px); }
   100% { transform: translateY(0px); }
+}
+
+/* Hide raw/unstyled Dev.to API injected headers and liquid tag cards */
+.prose .crayons-article__header,
+.prose .crayons-article__subheader,
+.prose .crayons-article__cover,
+.prose .crayons-article__actions,
+.prose .crayons-article__meta,
+.prose .crayons-tags,
+.prose .ltag__user,
+.prose .ltag__article,
+.prose .ltag__organization,
+.prose .ltag__podcast,
+.prose .highlight__panel {
+  display: none !important;
 }

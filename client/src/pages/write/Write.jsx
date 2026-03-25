@@ -1,6 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import publicAxios from '../../api/axios';
+import { collection, addDoc, serverTimestamp } from "firebase/firestore"; 
+import { db } from '../../api/firebase';
+import RichTextEditor from '../../components/write/RichTextEditor';
 
 const Write = () => {
   const navigate = useNavigate();
@@ -13,9 +15,24 @@ const Write = () => {
   });
   const [tagInput, setTagInput] = useState('');
   const [isPublishing, setIsPublishing] = useState(false);
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    const email = localStorage.getItem("emailPrefix");
+    if (email) {
+      setUser({
+        name: email.split('@')[0],
+        email: email
+      });
+    }
+  }, []);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleContentChange = (content) => {
+    setFormData({ ...formData, content });
   };
 
   const handleAddTag = (e) => {
@@ -33,14 +50,14 @@ const Write = () => {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
+    if (e) e.preventDefault();
+    if (!formData.title || !formData.content) return;
+    
     setIsPublishing(true);
 
     try {
-      // Mock author properties since auth isn't fully robust with profiles on the backend
-      const email = localStorage.getItem("emailPrefix") || "Anonymous";
-      const authorName = email.split('@')[0];
-
+      const authorName = user?.name || "Anonymous";
+      
       const newBlog = {
         title: formData.title,
         content: formData.content,
@@ -52,43 +69,43 @@ const Write = () => {
         reading_time: "5 min read",
         tags: formData.tags,
         likes: 0,
-        createdAt: new Date().toISOString()
+        createdAt: serverTimestamp()
       };
 
-      await publicAxios.post('/blogs', newBlog);
+      await addDoc(collection(db, "blogs"), newBlog);
       navigate('/');
     } catch (error) {
       console.error('Failed to publish blog:', error);
-      alert('Failed to publish. Please try again.');
+      alert('Failed to publish. ' + error.message);
       setIsPublishing(false);
     }
   };
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-12">
-      <div className="flex items-center justify-between mb-8">
-        <h1 className="text-3xl font-bold font-serif">Draft a new story</h1>
+    <div className="max-w-3xl mx-auto px-4 py-16">
+      <div className="flex items-center justify-between mb-12">
+        <h1 className="text-4xl font-bold font-serif text-gray-900 tracking-tight">Draft a new story</h1>
         <button 
           onClick={handleSubmit} 
           disabled={!formData.title || !formData.content || isPublishing}
-          className={`px-6 py-2 rounded-full text-white font-medium transition-colors shadow-sm ${
+          className={`px-5 py-2 rounded-full font-medium transition-colors text-sm ${
             !formData.title || !formData.content || isPublishing 
-              ? 'bg-gray-400 cursor-not-allowed' 
-              : 'bg-green-600 hover:bg-green-700'
+              ? 'bg-gray-200 text-gray-400 cursor-not-allowed' 
+              : 'bg-[#98a2b3] hover:bg-[#475467] text-white shadow-sm'
           }`}
         >
-          {isPublishing ? 'Publishing...' : 'Publish'}
+          {isPublishing ? 'Publishing' : 'Publish'}
         </button>
       </div>
 
-      <form className="flex flex-col gap-6" onSubmit={(e) => e.preventDefault()}>
+      <form className="flex flex-col gap-4" onSubmit={(e) => e.preventDefault()}>
         <input
           type="text"
           name="title"
           value={formData.title}
           onChange={handleChange}
           placeholder="Title"
-          className="w-full text-5xl font-bold font-serif text-gray-900 placeholder-gray-300 border-none outline-none focus:ring-0 px-0 bg-transparent resize-none"
+          className="w-full text-6xl font-bold font-serif text-gray-900 placeholder-[#cbd5e1] border-none outline-none focus:ring-0 px-0 bg-transparent resize-none leading-tight mb-2"
           autoFocus
         />
 
@@ -98,7 +115,7 @@ const Write = () => {
           value={formData.image}
           onChange={handleChange}
           placeholder="Cover Image URL (e.g. from unsplash)"
-          className="w-full text-lg text-gray-600 placeholder-gray-400 border-b border-gray-100 outline-none focus:ring-0 px-0 py-3 bg-transparent transition-colors focus:border-gray-300"
+          className="w-full text-base font-medium text-gray-600 placeholder-[#94a3b8] border-b border-gray-100 outline-none focus:ring-0 px-0 py-4 bg-transparent transition-colors focus:border-gray-200"
         />
         
         <input
@@ -107,20 +124,20 @@ const Write = () => {
           value={formData.category}
           onChange={handleChange}
           placeholder="Category (e.g. Technology, Design)"
-          className="w-full text-lg text-gray-600 placeholder-gray-400 border-b border-gray-100 outline-none focus:ring-0 px-0 py-3 bg-transparent transition-colors focus:border-gray-300"
+          className="w-full text-base font-medium text-gray-600 placeholder-[#94a3b8] border-b border-gray-100 outline-none focus:ring-0 px-0 py-4 bg-transparent transition-colors focus:border-gray-200"
         />
 
-        <textarea
-          name="content"
-          value={formData.content}
-          onChange={handleChange}
-          placeholder="Tell your story..."
-          className="w-full min-h-[400px] text-xl text-gray-800 placeholder-gray-300 border-none outline-none focus:ring-0 px-0 bg-transparent resize-y leading-relaxed"
-        />
+        {/* Rich Text Editor for Content */}
+        <div className="mt-8 mb-12">
+           <RichTextEditor 
+             content={formData.content} 
+             onChange={handleContentChange} 
+           />
+        </div>
 
-        <div className="border-t pt-6 mt-4">
-          <label className="block text-sm font-semibold text-gray-700 mb-2">Add or change tags (up to 5) so readers know what your story is about</label>
-          <div className="flex flex-wrap gap-2 mb-3">
+        <div className="border-t border-gray-100 pt-10 mt-6">
+          <label className="block text-sm font-semibold text-[#1d2939] mb-4">Add or change tags (up to 5) so readers know what your story is about</label>
+          <div className="flex flex-wrap gap-2 mb-4">
             {formData.tags.map(tag => (
               <span key={tag} className="flex items-center gap-1 px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm">
                 {tag}
@@ -135,7 +152,7 @@ const Write = () => {
             onKeyDown={handleAddTag}
             disabled={formData.tags.length >= 5}
             placeholder={formData.tags.length >= 5 ? "Maximum 5 tags reached" : "Add a tag and press Enter"}
-            className="w-full sm:w-80 text-sm text-gray-700 placeholder-gray-400 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-500 px-3 py-2 bg-transparent disabled:bg-gray-50"
+            className="w-full sm:w-96 text-sm text-[#475467] placeholder-[#98a2b3] border border-[#d0d5dd] rounded-lg outline-none focus:ring-2 focus:ring-[#f2f4f7] focus:border-[#98a2b3] px-4 py-3 bg-white disabled:bg-gray-50 transition-all shadow-sm"
           />
         </div>
       </form>

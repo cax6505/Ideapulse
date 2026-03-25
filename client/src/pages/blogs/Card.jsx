@@ -5,17 +5,17 @@ const Card = ({ blog }) => {
   const { id, title, image, category, author, authorPic, published_date, reading_time, tags, content } = blog;
 
   return (
-    <div>
+    <div className="mb-10">
       <Link
-        className="block rounded w-full lg:flex mb-10"
+        className="block rounded-3xl w-full lg:flex overflow-hidden bg-white shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border border-gray-100"
         to={`/blogs/${blog.id}`}
       >
         <div
-          className="h-48 lg:w-48 flex-none bg-cover text-center overflow-hidden opacity-75"
+          className="h-48 lg:h-auto lg:w-64 flex-none bg-cover bg-center text-center overflow-hidden"
           style={{ backgroundImage: `url(${image})` }}
           title={title}
         ></div>
-        <div className="bg-white rounded px-4 flex flex-col justify-between leading-normal">
+        <div className="p-6 flex flex-col justify-between leading-normal flex-1">
           <div>
             <div className="mt-3 md:mt-0 text-gray-700 font-bold text-2xl mb-2">
               {title}

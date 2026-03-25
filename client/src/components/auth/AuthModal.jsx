@@ -161,7 +161,7 @@ const AuthModal = ({ isOpen, onClose, initialMode = 'login' }) => {
             disabled={loading}
             className="w-full py-3.5 mt-2 bg-gray-900 text-white font-bold rounded-xl shadow-lg hover:bg-black transition-all flex items-center justify-center gap-2 disabled:opacity-50"
           >
-            {loading ? 'Processing...' : (isSignup ? 'Continue →' : 'Login →')}
+            {loading ? 'Processing' : (isSignup ? 'Continue →' : 'Login →')}
           </button>
 
           <div className="flex items-center my-4">

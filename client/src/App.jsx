@@ -13,7 +13,7 @@ function App() {
   return (
     <Provider store={store}>
       {isLandingPage ? (
-        <div className="w-full flex flex-col min-h-screen bg-[#f7f4ea]">
+        <div className="w-full flex flex-col min-h-screen bg-[#f7f4ea] transition-colors duration-300">
           <Navbar />
           <main className="flex-1">
             <Outlet />
@@ -21,7 +21,7 @@ function App() {
           <Footer isLanding={true} />
         </div>
       ) : (
-        <div className="max-w-screen-xl mx-auto px-2 flex flex-col min-h-screen">
+        <div className="max-w-screen-xl mx-auto px-2 flex flex-col min-h-screen transition-colors duration-300">
           <Navbar />
           <main className="mt-8 flex-1">
             <Outlet />

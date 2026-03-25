@@ -3,37 +3,49 @@ import { AiOutlineArrowRight } from "react-icons/ai";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams, Link } from "react-router-dom";
 import { fetchBlog } from "../../redux/features/singleBlog/blogSlice";
+import { fetchRelatedBlogs } from "../../redux/features/relatedBlogs/relatedBlogsSlice";
+import RelatedBlogCard from "./RelatedBlogCard";
 
 const SingleBlog = () => {
   const { id } = useParams();
   const dispatch = useDispatch();
   const { blog, isLoading, isError, error } = useSelector((state) => state.blog);
+  const { relatedBlogs } = useSelector((state) => state.relatedBlogs);
 
   useEffect(() => {
     dispatch(fetchBlog(id));
   }, [dispatch, id]);
 
+  useEffect(() => {
+    if (blog?.tags) {
+      dispatch(fetchRelatedBlogs({ tags: blog.tags, id }));
+    }
+  }, [dispatch, blog, id]);
+
   if (isLoading) {
     return (
-      <div className="flex justify-center items-center h-screen">
-        <p className="text-xl font-semibold">Loading article...</p>
+      <div className="flex justify-center items-center h-screen bg-white transition-colors">
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-12 h-12 border-4 border-black border-t-transparent rounded-full animate-spin"></div>
+          <p className="text-xl font-semibold text-gray-600">Loading article</p>
+        </div>
       </div>
     );
   }
 
   if (isError) {
     return (
-      <div className="flex justify-center items-center h-screen">
+      <div className="flex justify-center items-center h-screen bg-white transition-colors">
         <p className="text-xl font-semibold text-red-500">{error || "Failed to load the article"}</p>
       </div>
     );
   }
 
-  const { title, image, content, category, author, reading_time, published_date } = blog || {};
+  const { title, image, content, category, author, reading_time, published_date, tags } = blog || {};
 
   return (
-    <article className="mt-8 max-w-5xl mx-auto">
-      <div className="mb-4 md:mb-0 w-full mx-auto relative px-4 lg:px-0">
+    <article className="mt-8 max-w-5xl mx-auto px-4 lg:px-0 mb-20">
+      <div className="mb-4 md:mb-0 w-full relative">
         <h2 className="text-4xl md:text-5xl font-bold font-serif text-gray-900 leading-tight mb-4">
           {title}
         </h2>
@@ -54,14 +66,27 @@ const SingleBlog = () => {
         />
       </div>
 
-      <div className="flex flex-col lg:flex-row lg:space-x-12 px-4 lg:px-0">
+      <div className="flex flex-col lg:flex-row lg:space-x-12">
         <div 
-          className="prose prose-lg max-w-none text-gray-800 leading-relaxed w-full"
+          className="prose prose-lg max-w-none text-gray-800 leading-relaxed w-full prose-img:rounded-2xl prose-img:shadow-md prose-img:w-full prose-img:object-cover prose-headings:font-serif prose-headings:text-gray-900 prose-a:text-blue-600 hover:prose-a:text-blue-500 prose-a:no-underline hover:prose-a:underline prose-li:marker:text-blue-500 prose-blockquote:border-l-blue-500 prose-blockquote:bg-blue-50/50 prose-blockquote:px-6 prose-blockquote:py-2 prose-blockquote:rounded-r-xl prose-blockquote:not-italic"
           dangerouslySetInnerHTML={{ __html: content || "" }} 
         />
       </div>
 
-      <div className="flex items-center justify-between mt-12 mb-20 px-4 lg:px-0 border-t pt-8">
+      <div className="mt-12 mb-8 border-t pt-8">
+        <h3 className="text-2xl font-bold text-gray-900 mb-8">Related Stories</h3>
+        <div className="flex flex-wrap -m-4">
+          {relatedBlogs?.length > 0 ? (
+            relatedBlogs.map((relatedBlog) => (
+              <RelatedBlogCard key={relatedBlog.id} blog={relatedBlog} />
+            ))
+          ) : (
+            <p className="px-4 text-gray-500">No related stories found.</p>
+          )}
+        </div>
+      </div>
+
+      <div className="flex items-center justify-between border-t pt-8 mt-4">
         <Link
           to="/"
           className="text-gray-900 font-bold hover:text-blue-600 inline-flex items-center justify-center transition-colors"

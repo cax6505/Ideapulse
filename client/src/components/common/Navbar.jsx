@@ -1,7 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-
-
 import { FiEdit, FiUser, FiLogOut, FiSettings, FiChevronDown } from "react-icons/fi";
 import Search from "./Search";
 import AuthModal from "../auth/AuthModal";
@@ -65,8 +63,13 @@ const Navbar = () => {
   };
 
   const isLandingPage = !isLoggedIn;
-  const navBgClass = isLandingPage ? "bg-[#f7f4ea]" : (isScrolled ? "bg-white shadow-sm" : "bg-white");
-  const outerBorderClass = isLandingPage ? "border-b border-black" : "border-b border-gray-200";
+  const navBgClass = isLandingPage 
+    ? "bg-[#f7f4ea]" 
+    : (isScrolled ? "bg-white/80 backdrop-blur-md shadow-sm" : "bg-white");
+  
+  const outerBorderClass = isLandingPage 
+    ? "border-b border-black" 
+    : "border-b border-gray-200";
   
   const outerPadding = isLandingPage ? "pt-5 px-6 md:px-12 lg:px-16" : (isScrolled ? "pt-3 px-6 md:px-12 lg:px-16" : "pt-5 px-6 md:px-12 lg:px-16");
   const innerClass = isLandingPage ? "pb-5" : (isScrolled ? "pb-3" : "pb-5");
