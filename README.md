@@ -1,22 +1,4 @@
-<div align="center">
 
-# ✦ Ideapulse
-
-### A Modern Blogging Platform for Thinkers & Creators
-
-[![React](https://img.shields.io/badge/React-18.2-61DAFB?style=for-the-badge&logo=react&logoColor=white)](https://react.dev/)
-[![Firebase](https://img.shields.io/badge/Firebase-10.x-FFCA28?style=for-the-badge&logo=firebase&logoColor=black)](https://firebase.google.com/)
-[![Vite](https://img.shields.io/badge/Vite-5.0-646CFF?style=for-the-badge&logo=vite&logoColor=white)](https://vitejs.dev/)
-[![TailwindCSS](https://img.shields.io/badge/Tailwind-3.4-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
-[![Redux](https://img.shields.io/badge/Redux_Toolkit-2.0-764ABC?style=for-the-badge&logo=redux&logoColor=white)](https://redux-toolkit.js.org/)
-
-**Ideapulse** is a full-featured, Medium-inspired blogging platform built with React and Firebase. It delivers a premium reading and writing experience with real-time data, rich-text editing, social engagement features, and a clean, minimalist aesthetic.
-
-[Live Demo](#) · [Report Bug](../../issues) · [Request Feature](../../issues)
-
-</div>
-
----
 
 ## 📑 Table of Contents
 
@@ -30,7 +12,6 @@
 - [Contributing](#-contributing)
 - [License](#-license)
 
----
 
 ## ✨ Features
 
