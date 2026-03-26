@@ -16,47 +16,78 @@ const Write = () => {
   const [tagInput, setTagInput] = useState('');
   const [isPublishing, setIsPublishing] = useState(false);
   const [user, setUser] = useState(null);
+  const [errors, setErrors] = useState({});
 
   useEffect(() => {
-    const email = localStorage.getItem("emailPrefix");
-    if (email) {
+    const userName = localStorage.getItem("userName");
+    const emailPrefix = localStorage.getItem("emailPrefix");
+    const fullEmail = localStorage.getItem("email");
+    const photoURL = localStorage.getItem("photoURL");
+    
+    if (userName || emailPrefix) {
       setUser({
-        name: email.split('@')[0],
-        email: email
+        name: userName || emailPrefix,
+        email: fullEmail || `${emailPrefix}@example.com`,
+        photoURL: photoURL || "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?q=80&w=1470&auto=format&fit=crop"
       });
     }
   }, []);
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
   const handleContentChange = (content) => {
-    setFormData({ ...formData, content });
+    setFormData(prev => ({ ...prev, content }));
   };
 
   const handleAddTag = (e) => {
     if (e.key === 'Enter' || e.key === ',') {
       e.preventDefault();
       if (tagInput.trim() && !formData.tags.includes(tagInput.trim())) {
-        setFormData({ ...formData, tags: [...formData.tags, tagInput.trim()] });
+        setFormData(prev => ({ ...prev, tags: [...prev.tags, tagInput.trim()] }));
         setTagInput('');
       }
     }
   };
 
   const removeTag = (tagToRemove) => {
-    setFormData({ ...formData, tags: formData.tags.filter(tag => tag !== tagToRemove) });
+    setFormData(prev => ({ ...prev, tags: prev.tags.filter(tag => tag !== tagToRemove) }));
+  };
+
+  const validateForm = () => {
+    const newErrors = {};
+    if (!formData.title.trim()) newErrors.title = "Title is required";
+    if (!formData.content.trim() || formData.content === '<p></p>') newErrors.content = "Story content is required";
+    if (!formData.category.trim()) newErrors.category = "Category is required";
+    
+    if (formData.image.trim()) {
+      try {
+        new URL(formData.image);
+        // Basic check for image extensions or Unsplash
+        if (!formData.image.match(/\.(jpeg|jpg|gif|png|webp|avif|svg)(\?.*)?$/i) && !formData.image.includes('unsplash.com') && !formData.image.includes('images.')) {
+           newErrors.image = "Invalid image source. Please provide a valid image URL.";
+        }
+      } catch (e) {
+        newErrors.image = "Invalid image source. Must be a valid URL.";
+      }
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = async (e) => {
     if (e) e.preventDefault();
-    if (!formData.title || !formData.content) return;
+    
+    if (!validateForm()) return;
     
     setIsPublishing(true);
 
     try {
       const authorName = user?.name || "Anonymous";
+      const authorEmail = user?.email || "";
+      const authorPic = user?.photoURL || "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?q=80&w=1470&auto=format&fit=crop";
       
       const newBlog = {
         title: formData.title,
@@ -64,7 +95,8 @@ const Write = () => {
         image: formData.image || "https://images.unsplash.com/photo-1499951360447-b19be8fe80f5?q=80&w=1470&auto=format&fit=crop",
         category: formData.category || "General",
         author: authorName,
-        authorPic: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?q=80&w=1470&auto=format&fit=crop",
+        authorEmail: authorEmail,
+        authorPic: authorPic,
         published_date: new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }),
         reading_time: "5 min read",
         tags: formData.tags,
@@ -87,52 +119,62 @@ const Write = () => {
         <h1 className="text-4xl font-bold font-serif text-gray-900 tracking-tight">Draft a new story</h1>
         <button 
           onClick={handleSubmit} 
-          disabled={!formData.title || !formData.content || isPublishing}
-          className={`px-5 py-2 rounded-full font-medium transition-colors text-sm ${
-            !formData.title || !formData.content || isPublishing 
+          disabled={isPublishing}
+          className={`px-6 py-2.5 rounded-full font-bold transition-all text-sm shadow-md ${
+            isPublishing 
               ? 'bg-gray-200 text-gray-400 cursor-not-allowed' 
-              : 'bg-[#98a2b3] hover:bg-[#475467] text-white shadow-sm'
+              : 'bg-gray-900 hover:bg-black text-white'
           }`}
         >
-          {isPublishing ? 'Publishing' : 'Publish'}
+          {isPublishing ? 'Publishing...' : 'Publish'}
         </button>
       </div>
 
       <form className="flex flex-col gap-4" onSubmit={(e) => e.preventDefault()}>
-        <input
-          type="text"
-          name="title"
-          value={formData.title}
-          onChange={handleChange}
-          placeholder="Title"
-          className="w-full text-6xl font-bold font-serif text-gray-900 placeholder-[#cbd5e1] border-none outline-none focus:ring-0 px-0 bg-transparent resize-none leading-tight mb-2"
-          autoFocus
-        />
+        <div>
+          <input
+            type="text"
+            name="title"
+            value={formData.title}
+            onChange={handleChange}
+            placeholder="Title"
+            className={`w-full text-6xl font-bold font-serif text-gray-900 placeholder-[#cbd5e1] border-none outline-none focus:ring-0 px-0 bg-transparent resize-none leading-tight mb-2 ${errors.title ? 'border-b-2 border-red-500' : ''}`}
+            autoFocus
+          />
+          {errors.title && <p className="text-red-500 text-sm font-medium">{errors.title}</p>}
+        </div>
 
-        <input
-          type="url"
-          name="image"
-          value={formData.image}
-          onChange={handleChange}
-          placeholder="Cover Image URL (e.g. from unsplash)"
-          className="w-full text-base font-medium text-gray-600 placeholder-[#94a3b8] border-b border-gray-100 outline-none focus:ring-0 px-0 py-4 bg-transparent transition-colors focus:border-gray-200"
-        />
+        <div>
+          <input
+            type="text"
+            name="image"
+            value={formData.image}
+            onChange={handleChange}
+            placeholder="Cover Image URL (e.g. from unsplash)"
+            className={`w-full text-base font-medium text-gray-600 placeholder-[#94a3b8] border-b outline-none focus:ring-0 px-0 py-4 bg-transparent transition-colors ${errors.image ? 'border-red-500 focus:border-red-500' : 'border-gray-100 focus:border-gray-300'}`}
+          />
+          {errors.image && <p className="text-red-500 text-sm font-medium mt-1">{errors.image}</p>}
+        </div>
         
-        <input
-          type="text"
-          name="category"
-          value={formData.category}
-          onChange={handleChange}
-          placeholder="Category (e.g. Technology, Design)"
-          className="w-full text-base font-medium text-gray-600 placeholder-[#94a3b8] border-b border-gray-100 outline-none focus:ring-0 px-0 py-4 bg-transparent transition-colors focus:border-gray-200"
-        />
+        <div>
+          <input
+            type="text"
+            name="category"
+            value={formData.category}
+            onChange={handleChange}
+            placeholder="Category (e.g. Technology, Design)"
+            className={`w-full text-base font-medium text-gray-600 placeholder-[#94a3b8] border-b outline-none focus:ring-0 px-0 py-4 bg-transparent transition-colors ${errors.category ? 'border-red-500 focus:border-red-500' : 'border-gray-100 focus:border-gray-300'}`}
+          />
+          {errors.category && <p className="text-red-500 text-sm font-medium mt-1">{errors.category}</p>}
+        </div>
 
         {/* Rich Text Editor for Content */}
-        <div className="mt-8 mb-12">
+        <div className="mt-8 mb-4">
            <RichTextEditor 
              content={formData.content} 
              onChange={handleContentChange} 
            />
+           {errors.content && <p className="text-red-500 text-sm font-medium mt-2">{errors.content}</p>}
         </div>
 
         <div className="border-t border-gray-100 pt-10 mt-6">

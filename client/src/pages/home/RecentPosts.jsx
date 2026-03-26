@@ -18,12 +18,17 @@ const RecentPosts = ({ blogs }) => {
         {blogs.map(blog => (
           <Link key={blog.id} to={`/blogs/${blog.id}`} className="group flex flex-col h-full rounded-3xl overflow-hidden hover:-translate-y-2 hover:shadow-[0_30px_60px_-15px_rgba(0,0,0,0.1)] transition-all duration-500 bg-white shadow-[0_10px_40px_-15px_rgba(0,0,0,0.08)] border border-gray-100">
             {/* Image */}
-            <div className="h-64 w-full overflow-hidden relative">
-              <div 
-                className="w-full h-full bg-cover bg-center transition-transform duration-700 group-hover:scale-110"
-                style={{ backgroundImage: `url(${blog.image})` }}
-              ></div>
-              <div className="absolute top-4 left-4">
+            <div className="h-52 w-full overflow-hidden relative bg-gray-100">
+              <img 
+                src={blog.image} 
+                alt={blog.title}
+                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                onError={(e) => {
+                  e.target.style.display = 'none';
+                  e.target.parentElement.classList.add('bg-gradient-to-br', 'from-gray-200', 'to-gray-300');
+                }}
+              />
+              <div className="absolute top-4 left-4 z-10">
                  <span className="px-3 py-1 bg-white/90 backdrop-blur-sm text-[10px] font-bold text-gray-900 rounded-full shadow-sm uppercase tracking-wider ring-1 ring-black/5">
                     {blog.category}
                  </span>

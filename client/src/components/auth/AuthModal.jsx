@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { MdOutlineEmail, MdLockOutline } from "react-icons/md";
 import { FcGoogle } from "react-icons/fc";
 import { FaRegUser } from "react-icons/fa";
-import { signup, login, googleSignIn } from '../../api/auth';
+import { signup, login, googleSignIn, loadUserProfile } from '../../api/auth';
 import Modal from '../common/Modal';
 
 const AuthModal = ({ isOpen, onClose, initialMode = 'login' }) => {
@@ -27,10 +27,19 @@ const AuthModal = ({ isOpen, onClose, initialMode = 'login' }) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const storeEmailPrefix = (email) => {
-    if (email) {
-      const emailPrefix = email.split('@')[0];
+  const storeUserData = (response) => {
+    if (response.email) {
+      const emailPrefix = response.email.split('@')[0];
       localStorage.setItem('emailPrefix', emailPrefix);
+      localStorage.setItem('email', response.email);
+    }
+    if (response.displayName) {
+      localStorage.setItem('userName', response.displayName);
+    } else if (response.email) {
+      localStorage.setItem('userName', response.email.split('@')[0]);
+    }
+    if (response.photoURL) {
+      localStorage.setItem('photoURL', response.photoURL);
     }
   };
 
@@ -55,7 +64,9 @@ const AuthModal = ({ isOpen, onClose, initialMode = 'login' }) => {
         alert('Account created! Please login.');
       } else {
         localStorage.setItem('token', response.token); 
-        storeEmailPrefix(email); 
+        storeUserData(response);
+        // Load profile photo from Firestore before reloading
+        if (response.uid) await loadUserProfile(response.uid);
         onClose();
         window.location.reload();
       }
@@ -71,7 +82,9 @@ const AuthModal = ({ isOpen, onClose, initialMode = 'login' }) => {
     try {
       const response = await googleSignIn();
       localStorage.setItem('token', response.token);
-      storeEmailPrefix(response.email); 
+      storeUserData(response);
+      // Load profile photo from Firestore before reloading
+      if (response.uid) await loadUserProfile(response.uid);
       onClose();
       window.location.reload(); 
     } catch (error) {

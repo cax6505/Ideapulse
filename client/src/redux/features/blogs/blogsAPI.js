@@ -15,7 +15,7 @@ export const getBlogs = async (tags, search) => {
     const fetchFirestore = async () => {
       try {
         const q = query(collection(db, "blogs"), orderBy("createdAt", "desc"));
-        const querySnapshot = await withTimeout(getDocs(q), 3000); // 3s timeout
+        const querySnapshot = await withTimeout(getDocs(q), 10000); // 10s timeout
         return querySnapshot.docs.map(doc => ({
           id: doc.id,
           ...doc.data(),

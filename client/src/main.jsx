@@ -12,6 +12,7 @@ import About from './pages/About.jsx';
 
 import Write from './pages/write/Write.jsx';
 import Blogs from './pages/blogs/Blogs.jsx';
+import Profile from './pages/profile/Profile.jsx';
 
 const router = createBrowserRouter([
   {
@@ -37,6 +38,10 @@ const router = createBrowserRouter([
       {
         path: "/write",
         element: <ProtectedRoute element={<Write />} />,
+      },
+      {
+        path: "/profile",
+        element: <ProtectedRoute element={<Profile />} />,
       },
     ],
   },

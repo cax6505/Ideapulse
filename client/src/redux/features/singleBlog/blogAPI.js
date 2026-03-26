@@ -14,7 +14,7 @@ const getBlog = async (id) => {
         // 1. Try Firestore first (with timeout)
         try {
             const docRef = doc(db, "blogs", id);
-            const docSnap = await withTimeout(getDoc(docRef), 3000);
+            const docSnap = await withTimeout(getDoc(docRef), 10000);
 
             if (docSnap.exists()) {
                 const data = docSnap.data();

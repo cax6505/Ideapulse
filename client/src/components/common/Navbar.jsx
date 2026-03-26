@@ -11,16 +11,24 @@ const Navbar = () => {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [authMode, setAuthMode] = useState('login');
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [photoURL, setPhotoURL] = useState(null);
 
   const navigate = useNavigate();
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    const email = localStorage.getItem("emailPrefix");
+    const userName = localStorage.getItem("userName");
+    const emailPrefix = localStorage.getItem("emailPrefix");
+    const photo = localStorage.getItem("photoURL");
+    
     setIsLoggedIn(!!token);
-    if (email) {
-      const username = email.split('@')[0];
-      setUserProfile(username);
+    if (userName) {
+      setUserProfile(userName);
+    } else if (emailPrefix) {
+      setUserProfile(emailPrefix);
+    }
+    if (photo) {
+      setPhotoURL(photo);
     }
   }, []);
 
@@ -51,8 +59,11 @@ const Navbar = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("email");
     localStorage.removeItem("emailPrefix");
+    localStorage.removeItem("userName");
+    localStorage.removeItem("photoURL");
     setIsLoggedIn(false);
     setUserProfile("");
+    setPhotoURL(null);
     navigate("/");
     window.location.reload();
   };
@@ -105,7 +116,11 @@ const Navbar = () => {
                     className="flex items-center gap-2 p-1 rounded-full hover:bg-gray-100 transition-all"
                   >
                     <div className="w-10 h-10 rounded-full bg-gray-900 flex items-center justify-center text-white shadow-sm overflow-hidden border border-gray-200">
-                      <FiUser size={22} />
+                      {photoURL ? (
+                        <img src={photoURL} alt="Profile" className="w-full h-full object-cover" />
+                      ) : (
+                        <FiUser size={22} />
+                      )}
                     </div>
                     <FiChevronDown className={`text-gray-500 transition-transform duration-200 ${isDropdownOpen ? 'rotate-180' : ''}`} />
                   </button>

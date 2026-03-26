@@ -40,7 +40,6 @@ const Hero = ({ blogs }) => {
       <div className="w-full lg:w-[380px] flex flex-col gap-8">
         <div className="flex items-center justify-between border-b pb-4">
            <h3 className="text-xl font-bold text-gray-900 font-serif uppercase tracking-wider">Top Stories</h3>
-           <Link to="/blogs" className="text-xs font-bold text-blue-600 hover:underline">View All</Link>
         </div>
         <div className="flex flex-col gap-8">
           {otherFeatured.map(blog => (
