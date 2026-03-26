@@ -1,6 +1,10 @@
 import { collection, getDocs, query, orderBy } from "firebase/firestore";
 import { db } from "../../../api/firebase";
 
+// In-memory cache for instant subsequent loads
+let _cache = { blogs: [], timestamp: 0 };
+const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+
 // Helper for timeout
 const withTimeout = (promise, ms) => {
   const timeout = new Promise((_, reject) =>
@@ -11,11 +15,18 @@ const withTimeout = (promise, ms) => {
 
 export const getBlogs = async (tags, search) => {
   try {
+    // Return cached data if fresh (within TTL) and no search/filter active
+    const now = Date.now();
+    const hasFilters = (tags && tags.length > 0) || (search && search !== "");
+    if (!hasFilters && _cache.blogs.length > 0 && (now - _cache.timestamp) < CACHE_TTL) {
+      return _cache.blogs;
+    }
+
     // 1. Prepare fetches
     const fetchFirestore = async () => {
       try {
         const q = query(collection(db, "blogs"), orderBy("createdAt", "desc"));
-        const querySnapshot = await withTimeout(getDocs(q), 10000); // 10s timeout
+        const querySnapshot = await withTimeout(getDocs(q), 6000); // 6s timeout (was 10s)
         return querySnapshot.docs.map(doc => ({
           id: doc.id,
           ...doc.data(),
@@ -29,7 +40,10 @@ export const getBlogs = async (tags, search) => {
 
     const fetchDevto = async () => {
       try {
-        const response = await fetch('https://dev.to/api/articles?per_page=30');
+        const response = await withTimeout(
+          fetch('https://dev.to/api/articles?per_page=20'),
+          5000 // 5s timeout for DEV.to
+        );
         if (!response.ok) return [];
         const devtoData = await response.json();
         return devtoData.map(article => ({
@@ -62,6 +76,11 @@ export const getBlogs = async (tags, search) => {
     // 3. Merge and Filter
     let blogs = [...firestoreBlogs, ...devtoBlogs];
 
+    // Cache unfiltered results
+    if (!hasFilters) {
+      _cache = { blogs, timestamp: Date.now() };
+    }
+
     if (tags && tags.length > 0) {
       blogs = blogs.filter(blog => tags.some(tag => blog.tags.map(t => t.toLowerCase()).includes(tag.toLowerCase())));
     }
@@ -77,6 +96,8 @@ export const getBlogs = async (tags, search) => {
     return blogs;
   } catch (err) {
     console.error("Error fetching blogs:", err);
+    // Return cached data on error as fallback
+    if (_cache.blogs.length > 0) return _cache.blogs;
     return [];
   }
 };

@@ -1,8 +1,10 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { FiEdit, FiUser, FiLogOut, FiSettings, FiChevronDown } from "react-icons/fi";
+import { useDispatch } from "react-redux";
+import { FiEdit, FiUser, FiLogOut, FiSettings, FiChevronDown, FiBookmark } from "react-icons/fi";
 import Search from "./Search";
 import AuthModal from "../auth/AuthModal";
+import { clearBlogs } from "../../redux/features/blogs/blogsSlice";
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -14,6 +16,7 @@ const Navbar = () => {
   const [photoURL, setPhotoURL] = useState(null);
 
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -64,8 +67,9 @@ const Navbar = () => {
     setIsLoggedIn(false);
     setUserProfile("");
     setPhotoURL(null);
+    setIsDropdownOpen(false);
+    dispatch(clearBlogs());
     navigate("/");
-    window.location.reload();
   };
 
   const openAuthModal = (mode = 'login') => {
@@ -106,6 +110,10 @@ const Navbar = () => {
           <div className="flex items-center gap-4 md:gap-6">
             {isLoggedIn ? (
               <div className="flex items-center gap-6">
+                <Link to="/bookmarks" className="flex items-center gap-2 text-gray-600 hover:text-black font-medium transition-colors" title="Reading List">
+                  <FiBookmark className="text-xl opacity-80" />
+                  <span className="hidden sm:inline">Reading List</span>
+                </Link>
                 <Link to="/write" className="hidden sm:flex items-center gap-2 text-gray-600 hover:text-black font-medium transition-colors">
                   <FiEdit className="text-xl opacity-80" />
                   <span>Write</span>
@@ -139,6 +147,15 @@ const Navbar = () => {
                       >
                         <FiSettings className="text-lg opacity-70" />
                         <span>Profile Settings</span>
+                      </Link>
+
+                      <Link 
+                        to="/bookmarks" 
+                        onClick={() => setIsDropdownOpen(false)}
+                        className="flex sm:hidden items-center gap-3 px-4 py-2.5 text-sm text-gray-600 hover:bg-gray-50 hover:text-black transition-colors"
+                      >
+                        <FiBookmark className="text-lg opacity-70" />
+                        <span>Reading List</span>
                       </Link>
                       
                       <button

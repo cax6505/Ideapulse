@@ -1,7 +1,7 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchBlogs } from '../../redux/features/blogs/blogsSlice';
-import Hero from './Hero';
+import Trending from './Trending';
 import RecentPosts from './RecentPosts';
 import LandingBanner from './LandingBanner';
 
@@ -12,29 +12,43 @@ const Home = () => {
   );
   const { tags, search } = useSelector((state) => state.filter);
 
+  const [isLoggedIn, setIsLoggedIn] = useState(() => !!localStorage.getItem("token"));
+
   useEffect(() => {
-    dispatch(fetchBlogs({ tags, search }));
-  }, [dispatch, tags, search]);
-
-  const [isLoggedIn, setIsLoggedIn] = React.useState(false);
-
-  React.useEffect(() => {
     const token = localStorage.getItem("token");
     setIsLoggedIn(!!token);
   }, []);
 
-  if (isLoading) {
+  useEffect(() => {
+    if (!isLoggedIn) return; // Don't fetch if not logged in
+    dispatch(fetchBlogs({ tags, search }));
+
+    // Auto-refresh every 30 minutes
+    const interval = setInterval(() => {
+      dispatch(fetchBlogs({ tags, search }));
+    }, 30 * 60 * 1000);
+
+    return () => clearInterval(interval);
+  }, [dispatch, tags, search, isLoggedIn]);
+
+  // Show landing banner for logged-out users FIRST — before any loading check
+  if (!isLoggedIn) {
+    return <LandingBanner />;
+  }
+
+  // Only show full-screen loader on first load (no cached blogs)
+  if (isLoading && blogs.length === 0) {
     return (
       <div className="flex justify-center items-center h-[60vh]">
         <div className="flex flex-col items-center gap-4">
           <div className="w-12 h-12 border-4 border-black border-t-transparent rounded-full animate-spin"></div>
-          <p className="text-xl font-medium text-gray-600">Curating your feed</p>
+          <p className="text-xl font-medium text-gray-600">Loading stories…</p>
         </div>
       </div>
     );
   }
 
-  if (isError) {
+  if (isError && blogs.length === 0) {
     return (
       <div className="flex justify-center items-center h-[60vh]">
          <div className="text-center">
@@ -45,18 +59,14 @@ const Home = () => {
     );
   }
 
-  if (!isLoggedIn) {
-     return <LandingBanner />;
-  }
-
   return (
     <div className="font-primary mt-12 mb-20 space-y-20 px-4 md:px-0">
-      {/* Hero section */}
-      {blogs?.length > 0 && <Hero blogs={blogs} />}
+      {/* Trending Stories section (replaced old Hero) */}
+      {blogs?.length > 0 && <Trending blogs={blogs} />}
 
-      {/* Recent Posts Grid */}
-      {blogs?.length > 5 && (
-        <RecentPosts blogs={blogs.slice(5)} />
+      {/* Grid showing all stories */}
+      {blogs?.length > 0 && (
+        <RecentPosts blogs={blogs} />
       )}
     </div>
   );

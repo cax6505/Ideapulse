@@ -16,20 +16,27 @@ export const fetchBlogs = createAsyncThunk("blogs/fetchBlogs", async ({ tags, se
  const blogsSlice = createSlice({
     name: "blogs",
     initialState,
+    reducers: {
+        clearBlogs: (state) => {
+            state.blogs = [];
+            state.isLoading = false;
+            state.isError = false;
+            state.error = "";
+        },
+    },
     extraReducers: (builder) => {
         builder
         .addCase(fetchBlogs.pending, (state) => {
             state.isError = false;
             state.isLoading = true;
-            state.blogs=[]
+            // Don't clear blogs — keep stale data visible while refreshing
         })
         .addCase(fetchBlogs.fulfilled, (state, action) => {
             state.isLoading = false;
-            state.blogs=action.payload;
+            state.blogs = action.payload;
         })
         .addCase(fetchBlogs.rejected, (state, action) => {
             state.isLoading = false;
-            state.blogs = [];
             state.isError = true;
             state.error = action.error?.message;
         });
@@ -37,4 +44,5 @@ export const fetchBlogs = createAsyncThunk("blogs/fetchBlogs", async ({ tags, se
     }
  })
 
+ export const { clearBlogs } = blogsSlice.actions;
  export default blogsSlice.reducer;

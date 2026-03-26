@@ -15,6 +15,13 @@ const Blogs = () => {
 
   useEffect(() => {
     dispatch(fetchBlogs({ tags, search }));
+
+    // Auto-refresh every 30 minutes
+    const interval = setInterval(() => {
+      dispatch(fetchBlogs({ tags, search }));
+    }, 30 * 60 * 1000);
+
+    return () => clearInterval(interval);
   }, [dispatch, tags, search]);
 
   // Extract unique categories from all blogs
@@ -90,11 +97,11 @@ const Blogs = () => {
         </div>
       </div>
 
-      {isLoading ? (
+      {isLoading && blogs.length === 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {[...Array(6)].map((_, i) => <SkeletonCard key={i} />)}
         </div>
-      ) : isError ? (
+      ) : isError && blogs.length === 0 ? (
         <div className="text-center py-20">
           <p className="text-xl font-bold text-red-500 mb-2">Oops!</p>
           <p className="text-gray-500">{error || 'Something went wrong.'}</p>
