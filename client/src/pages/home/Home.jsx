@@ -4,6 +4,7 @@ import { fetchBlogs } from '../../redux/features/blogs/blogsSlice';
 import Trending from './Trending';
 import RecentPosts from './RecentPosts';
 import LandingBanner from './LandingBanner';
+import SkeletonCard from '../../components/common/SkeletonCard';
 
 const Home = () => {
   const dispatch = useDispatch();
@@ -36,13 +37,12 @@ const Home = () => {
     return <LandingBanner />;
   }
 
-  // Only show full-screen loader on first load (no cached blogs)
+  // Show skeleton loader on first load (no cached blogs)
   if (isLoading && blogs.length === 0) {
     return (
-      <div className="flex justify-center items-center h-[60vh]">
-        <div className="flex flex-col items-center gap-4">
-          <div className="w-12 h-12 border-4 border-black border-t-transparent rounded-full animate-spin"></div>
-          <p className="text-xl font-medium text-gray-600">Loading stories…</p>
+      <div className="font-primary mt-12 mb-20 space-y-20 px-4 md:px-0 container mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {[...Array(6)].map((_, i) => <SkeletonCard key={i} />)}
         </div>
       </div>
     );

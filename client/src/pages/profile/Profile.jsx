@@ -3,6 +3,7 @@ import { FiEdit2, FiCamera, FiUser } from 'react-icons/fi';
 import { updateUserMetadata } from '../../api/auth';
 import { getBlogs } from '../../redux/features/blogs/blogsAPI';
 import Card from '../blogs/Card';
+import SkeletonCard from '../../components/common/SkeletonCard';
 
 const Profile = () => {
   const [user, setUser] = useState({
@@ -169,7 +170,9 @@ const Profile = () => {
         </div>
 
         {loadingBlogs ? (
-          <div className="text-center py-12 text-gray-500 font-medium animate-pulse">Loading your stories...</div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {[...Array(4)].map((_, i) => <SkeletonCard key={i} />)}
+          </div>
         ) : myBlogs.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {myBlogs.map(blog => (

@@ -10,12 +10,14 @@ import BookmarkButton from "../../components/common/BookmarkButton";
 import ShareButtons from "../../components/common/ShareButtons";
 import CommentSection from "../../components/write/CommentSection";
 import { useBookmarks } from "../../hooks/useBookmarks";
+import SkeletonSingleBlog from "../../components/common/SkeletonSingleBlog";
+import SkeletonCard from "../../components/common/SkeletonCard";
 
 const SingleBlog = () => {
   const { id } = useParams();
   const dispatch = useDispatch();
   const { blog, isLoading, isError, error } = useSelector((state) => state.blog);
-  const { relatedBlogs } = useSelector((state) => state.relatedBlogs);
+  const { relatedBlogs, isLoading: isRelatedLoading } = useSelector((state) => state.relatedBlogs);
   const { isBookmarked, toggleBookmark } = useBookmarks();
 
   useEffect(() => {
@@ -29,14 +31,7 @@ const SingleBlog = () => {
   }, [dispatch, blog, id]);
 
   if (isLoading) {
-    return (
-      <div className="flex justify-center items-center h-screen bg-white transition-colors">
-        <div className="flex flex-col items-center gap-4">
-          <div className="w-12 h-12 border-4 border-black border-t-transparent rounded-full animate-spin"></div>
-          <p className="text-xl font-semibold text-gray-600">Loading article</p>
-        </div>
-      </div>
-    );
+    return <SkeletonSingleBlog />;
   }
 
   if (isError) {
@@ -107,9 +102,17 @@ const SingleBlog = () => {
             Related Stories
           </h3>
           <div className="flex flex-wrap -m-4">
-            {relatedBlogs?.length > 0 ? (
+            {isRelatedLoading ? (
+               [...Array(3)].map((_, i) => (
+                 <div key={i} className="w-full sm:w-1/2 lg:w-1/3 p-4">
+                    <SkeletonCard />
+                 </div>
+               ))
+            ) : relatedBlogs?.length > 0 ? (
               relatedBlogs.map((relatedBlog) => (
-                <RelatedBlogCard key={relatedBlog.id} blog={relatedBlog} />
+                <div className="w-full sm:w-1/2 lg:w-1/3 p-4" key={relatedBlog.id}>
+                  <RelatedBlogCard blog={relatedBlog} />
+                </div>
               ))
             ) : (
               <p className="px-4 text-gray-500">No related stories found.</p>

@@ -2,6 +2,7 @@ import React, { useEffect, useState, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchBlogs } from '../../redux/features/blogs/blogsSlice';
 import Card from './Card';
+import SkeletonCard from '../../components/common/SkeletonCard';
 
 const ITEMS_PER_PAGE = 9;
 
@@ -50,25 +51,6 @@ const Blogs = () => {
     setActiveCategory(cat);
     setCurrentPage(1);
   };
-
-  // Skeleton loader
-  const SkeletonCard = () => (
-    <div className="rounded-2xl overflow-hidden bg-white border border-gray-100 shadow-sm animate-pulse">
-      <div className="h-48 bg-gray-200"></div>
-      <div className="p-5 space-y-3">
-        <div className="h-5 bg-gray-200 rounded w-3/4"></div>
-        <div className="h-4 bg-gray-100 rounded w-full"></div>
-        <div className="h-4 bg-gray-100 rounded w-2/3"></div>
-        <div className="flex items-center gap-3 pt-4 border-t border-gray-50 mt-4">
-          <div className="w-9 h-9 rounded-full bg-gray-200"></div>
-          <div className="space-y-2 flex-1">
-            <div className="h-3 bg-gray-200 rounded w-24"></div>
-            <div className="h-2 bg-gray-100 rounded w-16"></div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
 
   return (
     <div className="container mx-auto px-4 mt-12 mb-20">

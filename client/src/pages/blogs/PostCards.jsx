@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchBlogs } from "../../redux/features/blogs/blogsSlice";
 import Card from "./Card";
+import SkeletonCard from "../../components/common/SkeletonCard";
 
 const PostCards = () => {
   const dispatch = useDispatch();
@@ -30,8 +31,16 @@ const PostCards = () => {
   return (
     <div className="w-full lg:w-2/3">
       {/* single cards */}
-      {!isError && !isLoading && paginatedBlogs?.length > 0 ? (
-        <div>
+      {isLoading ? (
+        <div className="flex flex-col gap-6">
+          {[...Array(5)].map((_, index) => (
+            <div key={index} className="w-full">
+              <SkeletonCard />
+            </div>
+          ))}
+        </div>
+      ) : !isError && paginatedBlogs?.length > 0 ? (
+        <div className="space-y-6">
           {paginatedBlogs.map((blog, index) => (
             <Card key={index} blog={blog} />
           ))}
